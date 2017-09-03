@@ -2,14 +2,15 @@
 
 declare -A prev_name_max=()
 echo "/**"
-echo " * Pid    : Process Id"
+echo " * PID    : Process Id"
 echo " * Name   : Process Name"
 echo " * CurHeap: Heap memory(MB) currently in use"
 echo " * MaxHeap: Max Heap memory(MB) used by now"
+echo " * %CPU   : Current CPU use by PID"
 echo " */"
-echo "=====  ============================================  =======  ======="
-echo " Pid                       Name                      CurHeap  MaxHeap"
-echo "=====  ============================================  =======  ======="
+echo "=====  ============================================  =======  =======  ====="
+echo " PID                       Name                      CurHeap  MaxHeap  %_CPU"
+echo "=====  ============================================  =======  =======  ====="
 
 
 while true
@@ -63,7 +64,8 @@ do
         fi
             
         #output for current pid
-        printf "%-6s %-44s %8.2f %8.2f\n" $pid $name $MEMORY ${curr_name_max["$name"]} | sort
+        cpuuse=$(ps -p $pid -o %cpu | tail -n 1 )
+        printf "%-6s %-44s %8.2f %8.2f  %5.1f\n" $pid $name $MEMORY ${curr_name_max["$name"]} $cpuuse | sort
     done
     
     
