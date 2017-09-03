@@ -7,16 +7,16 @@
 * Now open this folder in terminal and enter ` ./jpsstat.sh `
 * This will list the memory details and cpu use of all running java programs with live refresh.
 ## How to stop
-* Once the script is running and displaying the details, if you want to stop the script running, press ` ctrl+c ` and then enter ` reset `
+* Press ` ctrl+c ` to stop the script and enter ` reset ` to clear your screen
 ## Script details
 * This uses ` jps ` command to get the list of all processes running java programs (_jvm instances_)
-* Then for each _procecss_id_ obtained from jps, it runs ` jstat -gc <process_id>`
-* It calculates Heap memory by adding following fields of output - 
+* Then for each _procecss_id_ obtained from jps, it runs ` jstat -gc <process_id> `
+* It calculates Heap memory by adding following fields of ` jstat -gc ` output - 
   * ` S0U `: Survivor space 0 utilization
   * ` S1U `: Survivor space 1 utilization
   * ` EU ` : Eden space utilization
   * ` OU ` : Old space utilization
-* It tracks cpu uses using ` ps -p $pid -o %cpu ` command 
+* It tracks cpu uses using ` ps -p <process_id> -o %cpu ` command 
 * It uses ` tput cuu <# of lines> ` to refresh screen
 ## Requirements
 * Jdk
