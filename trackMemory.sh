@@ -1,11 +1,15 @@
 #!/bin/bash
 
-MEMORY=0
-
 declare -A prev_name_max=()
-
-echo "pid    Name                                          CurrMem  Max "
-echo "====   ============================================  =======  ===="
+echo "/**"
+echo " * Pid    : Process Id"
+echo " * Name   : Process Name"
+echo " * CurHeap: Heap memory(MB) currently in use"
+echo " * MaxHeap: Max Heap memory(MB) used by now"
+echo " */"
+echo "=====  ============================================  =======  ======="
+echo " Pid                       Name                      CurHeap  MaxHeap"
+echo "=====  ============================================  =======  ======="
 
 
 while true
@@ -23,7 +27,7 @@ do
         tput cuu $(( ${#prev_name_max[@]} )) 
     fi
 
-    #for each we get in jps in current loop
+    #for each process line we get in jps in current loop
     IFS=$' '
     for LINE in "${DATA[@]}"
     do
@@ -41,7 +45,7 @@ do
         if [ ${prev_name_max["${TOKENS[1]}"]+_} ]; then
             curr_name_max["${TOKENS[1]}"]=${prev_name_max["${TOKENS[1]}"]}
         else
-            curr_name_max["${TOKENS[1]}"]=0
+            curr_name_max["${TOKENS[1]}"]=0.0
         fi
     done
 
@@ -50,8 +54,8 @@ do
     for pid in "${!curr_pid_name[@]}"; 
     do
         name=${curr_pid_name["$pid"]}
-        MEMORY=$(jstat -gc $pid | tail -n 1 | awk '{split($0,a," "); sum=a[3]+a[4]+a[6]+a[8]; mb=sum/1024; printf "%i", mb}')
-        if [ ${prev_name_max[$name]+_} ] && (( $MEMORY < ${prev_name_max[$name]} ))
+        MEMORY=$(jstat -gc $pid | tail -n 1 | awk '{split($0,a," "); sum=a[3]+a[4]+a[6]+a[8]; mb=sum/1024; print mb}')
+        if [ ${prev_name_max[$name]+_} ] && (( $(echo "$MEMORY < ${prev_name_max[$name]}" | bc -l)  ))
         then
             curr_name_max["$name"]=${prev_name_max[$name]}
         else
@@ -59,7 +63,7 @@ do
         fi
             
         #output for current pid
-        printf "%-6s %-45s %-8d %-7d\n" $pid $name $MEMORY ${curr_name_max["$name"]} | sort
+        printf "%-6s %-44s %8.2f %8.2f\n" $pid $name $MEMORY ${curr_name_max["$name"]} | sort
     done
     
     
