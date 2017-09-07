@@ -5,7 +5,7 @@
 * Right click on ` jpsstat.sh ` file and select ` properties `
 * Under ` Permissions ` tab, check the ` Allow executing file as program ` option.
 * Now open this folder in terminal and enter ` ./jpsstat.sh `
-* This will list the memory details and cpu use of all running java programs with live refresh.
+* This will list the  **current_memory** , **max_heap_till_now** , and **current_cpu_by_jvm** of all running java programs with live refresh.
 ## How to stop
 * Press ` ctrl+c ` to stop the script and enter ` reset ` to clear your screen
 ## Script details
