@@ -1,5 +1,5 @@
 # jps_stat
-###### A bash script to moniter memory and cpu details of all java programs running on current linux system.
+###### A bash script to moniter **current_memory** , **max_heap_till_now** , and **current_cpu_by_jvm** details of all java programs running on current linux system.
 ## How to use
 * Clone this repo and extract and open the folder
 * Right click on ` jpsstat.sh ` file and select ` properties `
