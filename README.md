@@ -12,6 +12,9 @@
 ## How to stop
 * Press ` ctrl+c ` to stop the script and enter ` reset ` to clear your screen
 
+## Output
+<img src="images/output.gif" >
+
 ## Script details
 * This uses ` jps ` command to get the list of all processes running java programs (_jvm instances_)
 * Then for each _process_id_ obtained from jps, it runs ` jstat -gc <process_id> `
