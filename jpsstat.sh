@@ -65,53 +65,34 @@ do
         then
             continue
         fi
-        
+        pid=${TOKENS[0]}
         # insert to associative array
-        curr_pid_name["${TOKENS[0]}"]=${TOKENS[1]}
+        curr_pid_name["$pid"]=${TOKENS[1]}
         
-        # get the max heap memory from previous loop
-        if [ ${prev_pid_max_heap["${TOKENS[0]}"]+_} ]; then
-            curr_pid_max_heap["${TOKENS[0]}"]=${prev_pid_max_heap["${TOKENS[0]}"]}
-        else
-            curr_pid_max_heap["${TOKENS[0]}"]=0
-        fi
-        
-        # get the max ram used, from previous loop
-        if [ ${prev_pid_max_ram["${TOKENS[0]}"]+_} ]; then
-            curr_pid_max_ram["${TOKENS[0]}"]=${prev_pid_max_ram["${TOKENS[0]}"]}
-        else
-            curr_pid_max_ram["${TOKENS[0]}"]=0
-        fi
-    done
-
-
-    # get the memroy use for each pid in curr_pid_name
-    for pid in "${!curr_pid_name[@]}"; 
-    do
-        HEAP_MEMORY=$(jstat -gc $pid | tail -n 1 | awk '{split($0,a," "); sum=a[3]+a[4]+a[6]+a[8]; print sum/1024}' )
+        # compare current heap with previous to get max_heap
+        HEAP_MEMORY=$( (jstat -gc $pid 2>/dev/null || echo "0 0 0 0 0 0 0 0 0") | tail -n 1 | awk '{split($0,a," "); sum=a[3]+a[4]+a[6]+a[8]; print sum/1024}' ) 2>/dev/null
         HEAP_MEMORY=${HEAP_MEMORY%.*}
-        RAM_MEMORY=$(( ` cut -d' ' -f2 <<<cat /proc/$pid/statm ` / 1024 ))
-        
-        if [ ${prev_pid_max_heap[$pid]+_} ] && [ $HEAP_MEMORY -lt ${prev_pid_max_heap[$pid]} ]
-        then
-            curr_pid_max_heap["$pid"]=${prev_pid_max_heap[$pid]}
+        if [ ${prev_pid_max_heap["$pid"]+_} ] && [ $HEAP_MEMORY -lt ${prev_pid_max_heap[$pid]} ]; then
+            curr_pid_max_heap["$pid"]=${prev_pid_max_heap["$pid"]}
         else
             curr_pid_max_heap["$pid"]=$HEAP_MEMORY
         fi
         
-        if [ ${prev_pid_max_ram[$pid]+_} ] && [ $RAM_MEMORY -lt ${prev_pid_max_ram[$pid]} ]
-        then
-            curr_pid_max_ram["$pid"]=${prev_pid_max_ram[$pid]}
+        # compare current ram with previous to get max_ram
+        RAM_MEMORY=$(( ` cut -d' ' -f2 <<<cat /proc/$pid/statm 2>/dev/null || echo "0" ` / 1024 ))
+        RAM_MEMORY=${RAM_MEMORY%.*}
+        if [ ${prev_pid_max_ram["$pid"]+_} ] && [ $RAM_MEMORY -lt ${prev_pid_max_ram[$pid]} ]; then
+            curr_pid_max_ram["$pid"]=${prev_pid_max_ram["$pid"]}
         else
             curr_pid_max_ram["$pid"]=$RAM_MEMORY
         fi
-          
+
         #output for current pid
-        cpuuse=$(ps -p $pid -o %cpu | tail -n 1 )
+        cpuuse=$( (ps -p $pid -o %cpu 2>/dev/null || echo "0") | tail -n 1 )
         cpuuse=${cpuuse%.*}
         printf "%-6s %-30s %8i %8i %7d %7d  %5i\n" $pid ${curr_pid_name["$pid"]:0:30} $HEAP_MEMORY ${curr_pid_max_heap["$pid"]} $RAM_MEMORY ${curr_pid_max_ram["$pid"]} $cpuuse | sort 
-    done 
-    
+    done
+
     
     # clean stuff of previous iteration
     unset prev_pid_max_heap
