@@ -28,6 +28,15 @@
 * It uses ` tput cuu <# of lines> ` to refresh screen
 * All the decimal values in the output is truncated using ` %.* `
 
+
+## Troubleshooting
+1.  Getting error as ` ./jpsstat.sh: 38: ./jpsstat.sh: Syntax error: "(" unexpected `
+    - Make sure you run the script as ` ./jpsstat.sh ` and not as ` sh ./jpsstat.sh `
+    - Use ` bash --version ` to make sure your bash version is >= 4.0
+2. Getting error as ` bash: ./jpsstat.sh: Permission denied `
+    - Make sure you have given the permission to the "jpsstat.sh" file to execute as program.
+    - Either use ` chmod 777 jpsstat.sh ` command or follow *[How to use](https://github.com/amarjeetanandsingh/jps_stat#how-to-use)* section to give execute permission to script file.
+
 ## Requirements
 * Jdk
 * Linux System _(Tested on Ubuntu 16.04 LTS)_
