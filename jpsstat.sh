@@ -21,15 +21,34 @@
 # IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 # CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-echo "/**"
-echo " * PID    : Process Id"
-echo " * Name   : Process Name"
-echo " * CurHeap: Heap memory(MB) currently in use"
-echo " * MaxHeap: Max Heap memory(MB) used by now"
-echo " * CurRAM : Current RAM(MB) used"
-echo " * MaxRAM : Max RAM(MB) used by now"
-echo " * %_CPU  : Current CPU use by PID"
-echo " */"
+# check if -help parameter is given.
+    for var in "$@"
+    do
+        if [ $var = "-h" ] || [ $var = "-help" ]
+        then
+            echo "usage: ./jpsstat.sh [options]"
+            echo ""
+            echo "[OPTIONS] :"
+            echo "    -l"
+            echo "        Displays the full package name for the application's main class or the full path name to the application's JAR file."
+            echo ""
+            echo "    -h | -help"
+            echo "        Display this help menu"
+            echo ""
+            echo "/********* Output Format *****************"
+            echo " * PID    : Process Id"
+            echo " * Name   : Process Name"
+            echo " * CurHeap: Heap memory(MB) currently in use"
+            echo " * MaxHeap: Max Heap memory(MB) used by now"
+            echo " * CurRAM : Current RAM(MB) used"
+            echo " * MaxRAM : Max RAM(MB) used by now"
+            echo " * %_CPU  : Current CPU use by PID"
+            echo " */"
+            exit 0
+        fi
+    done
+
+
 echo "=====  ==============================  =======  =======  ======  ======  ====="
 echo " PID                Name               CurHeap  MaxHeap  CurRAM  MaxRAM  %_CPU"
 echo "=====  ==============================  =======  =======  ======  ======  ====="
@@ -46,7 +65,20 @@ do
     declare -A curr_pid_max_ram=()
     
     IFS=$'\n'
-    DATA=($("jps"))
+    DATA=
+    ## check if -l option is given
+    for var in "$@"
+    do
+        if [ $var = "-l" ]
+        then
+            DATA=$(jps -l)
+        fi
+    done
+
+    if [ -z "$DATA" ]
+    then
+        DATA=($("jps"))
+    fi
     
     # put curser up with # of prev processes
     if (( ${#prev_pid_max_heap[@]} > 0 ));
@@ -59,9 +91,11 @@ do
     for LINE in "${DATA[@]}"
     do
         read -ra TOKENS <<< "$LINE"
-        
+        # if -l option is given, get the last element of the jar file/class name
+        TOKENS[1]=${TOKENS[1]##*[\\ /]}
+
         # skip the process if its Jps or Jstat itself 
-        if [ "${TOKENS[1]}" == "Jps" ] || [ "${TOKENS[1]}" == "Jstat" ]
+        if [ "${TOKENS[1]}" == "Jps" ] || [ "${TOKENS[1]}" == "sun.tools.jps.Jps" ] || [ "${TOKENS[1]}" == "Jstat" ]
         then
             continue
         fi

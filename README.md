@@ -9,6 +9,13 @@
 * Now open this folder in terminal and enter ` ./jpsstat.sh `
 * This will list the  **current_heap_memory** , **max_heap_till_now**, **current_ram_use**, **max_ram_used** and **current_cpu_use** of all running java processes on your linux system with live refresh.
 
+## Options
+This tool expects options in ` ./jpsstat.sh [option] ` format.
+* ` -l ` : use this option to display the full package name for the application's main class or the full path name to the application's JAR file
+* ` -h ` : display the help details. You can also use ` -help `
+
+Example: `./jpsstat.sh -l ` or `./jpsstat.sh -h`
+
 ## How to stop
 * Press ` ctrl+c ` to stop the script and enter ` reset ` to clear your screen
 
