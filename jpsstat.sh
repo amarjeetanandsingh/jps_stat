@@ -119,8 +119,8 @@ do
         fi
         pid=${TOKENS[0]}
         # insert to associative array
-        curr_pid_name["$pid"]=${TOKENS[1]}
-        
+        curr_pid_name["$pid"]=${TOKENS[1]:-"<no name>"}
+
         # compare current heap with previous to get max_heap
         HEAP_MEMORY=$( (jstat -gc $pid 2>/dev/null || echo "0 0 0 0 0 0 0 0 0") | tail -n 1 | awk '{split($0,a," "); sum=a[3]+a[4]+a[6]+a[8]; print sum/1024}' ) 2>/dev/null
         HEAP_MEMORY=${HEAP_MEMORY%.*}
