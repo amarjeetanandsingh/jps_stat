@@ -23,10 +23,10 @@
 
 RUNONCE=0
 SHOW_HEADERS=1
+commandline_args=("$@")
 
 parse_options() {
-  for var in "$@"
-  do
+  for var in "${commandline_args[@]}"; do
       if [ $var = "-h" ] || [ $var = "-help" ]
       then
           echo "usage: ./jpsstat.sh [options]"
