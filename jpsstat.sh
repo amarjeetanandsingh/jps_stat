@@ -21,38 +21,56 @@
 # IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 # CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-# check if -help parameter is given.
-    for var in "$@"
-    do
-        if [ $var = "-h" ] || [ $var = "-help" ]
-        then
-            echo "usage: ./jpsstat.sh [options]"
-            echo ""
-            echo "[OPTIONS] :"
-            echo "    -l"
-            echo "        Displays the full package name for the application's main class or the full path name to the application's JAR file."
-            echo ""
-            echo "    -h | -help"
-            echo "        Display this help menu"
-            echo ""
-            echo "/********* Output Format *****************"
-            echo " * PID    : Process Id"
-            echo " * Name   : Process Name"
-            echo " * CurHeap: Heap memory(MB) currently in use"
-            echo " * MaxHeap: Max Heap memory(MB) used by now"
-            echo " * CurRAM : Current RAM(MB) used"
-            echo " * MaxRAM : Max RAM(MB) used by now"
-            echo " * %_CPU  : Current CPU use by PID"
-            echo " */"
-            exit 0
-        fi
-    done
+RUNONCE=0
+SHOW_HEADERS=1
 
+parse_options() {
+  for var in "$@"
+  do
+      if [ $var = "-h" ] || [ $var = "-help" ]
+      then
+          echo "usage: ./jpsstat.sh [options]"
+          echo ""
+          echo "[OPTIONS] :"
+          echo "    -l"
+          echo "        Displays the full package name for the application's main class or the full path name to the application's JAR file."
+          echo ""
+          echo "    -1 | --once"
+          echo "        Just run the script once, do not continuously refresh"
+          echo ""
+          echo "    -H | --no-headers"
+          echo "        Do not display the text header with the field names"
+          echo ""
+          echo "    -h | -help"
+          echo "        Display this help menu"
+          echo ""
+          echo "/********* Output Format *****************"
+          echo " * PID    : Process Id"
+          echo " * Name   : Process Name"
+          echo " * CurHeap: Heap memory(MB) currently in use"
+          echo " * MaxHeap: Max Heap memory(MB) used by now"
+          echo " * CurRAM : Current RAM(MB) used"
+          echo " * MaxRAM : Max RAM(MB) used by now"
+          echo " * %_CPU  : Current CPU use by PID"
+          echo " */"
+          exit 0
+      elif [ $var = "-1" ] || [ $var = "--once" ]
+      then
+          RUNONCE=1
+      elif [ $var = "-H" ] || [ $var = "--no-headers" ]
+      then
+          SHOW_HEADERS=0
+      fi
+  done
+}
 
-echo "=====  ==============================  =======  =======  ======  ======  ====="
-echo " PID                Name               CurHeap  MaxHeap  CurRAM  MaxRAM  %_CPU"
-echo "=====  ==============================  =======  =======  ======  ======  ====="
+parse_options
 
+if [ $SHOW_HEADERS -eq 1 ]; then
+    echo "=====  ==============================  =======  =======  ======  ======  ====="
+    echo " PID                Name               CurHeap  MaxHeap  CurRAM  MaxRAM  %_CPU"
+    echo "=====  ==============================  =======  =======  ======  ======  ====="
+fi
 
 declare -A prev_pid_max_heap=()
 declare -A prev_pid_max_ram=()
@@ -101,8 +119,8 @@ do
         fi
         pid=${TOKENS[0]}
         # insert to associative array
-        curr_pid_name["$pid"]=${TOKENS[1]}
-        
+        curr_pid_name["$pid"]=${TOKENS[1]:-"<no name>"}
+
         # compare current heap with previous to get max_heap
         HEAP_MEMORY=$( (jstat -gc $pid 2>/dev/null || echo "0 0 0 0 0 0 0 0 0") | tail -n 1 | awk '{split($0,a," "); sum=a[3]+a[4]+a[6]+a[8]; print sum/1024}' ) 2>/dev/null
         HEAP_MEMORY=${HEAP_MEMORY%.*}
@@ -144,6 +162,11 @@ do
     do
         prev_pid_max_ram[$pid]=${curr_pid_max_ram[$pid]}
     done
-    
+
+    if [ $RUNONCE -eq 1 ]
+    then
+        exit
+    fi
+
     sleep 0.3
 done
