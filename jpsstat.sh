@@ -89,7 +89,7 @@ do
     do
         if [ $var = "-l" ]
         then
-            DATA=$(jps -l)
+            DATA=($(jps -l))
         fi
     done
 
