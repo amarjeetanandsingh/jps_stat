@@ -49,6 +49,10 @@ Example: `./jpsstat.sh -l ` or `./jpsstat.sh -h`
 * Linux System _(Tested on Ubuntu 16.04 LTS)_
 * Bash version >=  4.0
 
+
+## Donate
+[Sponsor Open Source development activities and free contents for the community.](https://amarjeet.in)
+
 ## License
 MIT License
 
