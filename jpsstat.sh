@@ -113,7 +113,7 @@ do
         TOKENS[1]=${TOKENS[1]##*[\\ /]}
 
         # skip the process if its Jps or Jstat itself 
-        if [ "${TOKENS[1]}" == "Jps" ] || [ "${TOKENS[1]}" == "sun.tools.jps.Jps" ] || [ "${TOKENS[1]}" == "Jstat" ] || [ "${TOKENS[1]}" == "sun.tools.jstat.Jstat" ]
+        if [ "${TOKENS[1]}" == "Jps" ] || [ "${TOKENS[1]}" == "sun.tools.jps.Jps" ] || [ "${TOKENS[1]}" == "Jstat" ] || [ "${TOKENS[1]}" == "sun.tools.jstat.Jstat" ] ||  [ -z "${TOKENS[1]}" ]
         then
             continue
         fi
